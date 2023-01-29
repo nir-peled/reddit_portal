@@ -1,0 +1,19 @@
+{
+  "name": "reddit_portal",
+  "version": "1.0.0",
+  "description": "Final project in network developing class 2023a",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nir-peled/reddit_portal.git"
+  },
+  "author": "Nir Peled",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nir-peled/reddit_portal/issues"
+  },
+  "homepage": "https://github.com/nir-peled/reddit_portal#readme"
+}
