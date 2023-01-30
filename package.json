@@ -2,10 +2,10 @@
   "name": "reddit_portal",
   "version": "1.0.0",
   "description": "Final project in network developing class 2023a",
-  "main": "server/main.js",
+  "main": "controllers/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server/main.js"
+    "start": "node controllers/main.js"
   },
   "repository": {
     "type": "git",
@@ -18,8 +18,13 @@
   },
   "homepage": "https://github.com/nir-peled/reddit_portal#readme",
   "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "mongodb": "^4.13.0"
+    "jsonwebtoken": "^9.0.0",
+    "mongodb": "^4.13.0",
+    "mongoose": "^6.9.0",
+    "pug": "^3.0.2"
   }
 }

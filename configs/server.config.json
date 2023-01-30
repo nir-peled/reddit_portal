@@ -1,0 +1,5 @@
+{
+	"uri": "127.0.0.1", 
+	"port": 8081, 
+	"database_url": "mongodb://127.0.0.1:27017/project" 
+}
