@@ -1,0 +1,24 @@
+doctype html
+html
+	head
+		meta(charset='UTF-8')
+		link(href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" 
+		rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+		crossorigin="anonymous")
+		link(rel="stylesheet" type="text/css" href="/css/style.css")
+		script(src="https://code.jquery.com/jquery-3.6.1.min.js")
+		script(type="text/javascript" src="/scripts/default.js")
+		block scripts
+	body
+		nav(class="navbar fixed-top bg-light")
+			div(class="container-fluid d-flex justify-content-around")
+				- if (user_data && user_data.username)
+					h4= "Welcome, " + user_data.username + "!"
+					form(action="logout" method="post")
+						input(type="hidden" name="username" value=user_data.username)
+						input(type="submit" value="Log Out" id="logout_button")
+				- else
+					h4 Welcome, Guest!
+					a(href="login") Login
+
+		block contents

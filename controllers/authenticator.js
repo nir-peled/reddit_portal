@@ -4,9 +4,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const jwtSecret = '5189fdfa918c60cb96a1937501e0dc9ae71c28ceb92ea277ec6784d7cd4abe1182bd34';
 
-// the User model
-var User;
-
 class Authenticator {
 	#database;
 	#pass_min_length;
@@ -27,8 +24,6 @@ class Authenticator {
 		this.#salt_rounds = config.salt_rounds;
 		this.#default_role = config.default_role;
 		this.#max_age_sec = config.max_age_sec;
-
-		User = database.models().User;
 	}
 
 	async register(username, password, role=this.#default_role) {
@@ -36,18 +31,14 @@ class Authenticator {
 			throw new Error("empty parameters");
 		if (password.length < this.#pass_min_length)
 			throw new Error(`short password`);
+
 		let user = await this.#get_user(username);
 		if (user !== null)
 			throw new Error("username used");
 
 		let hashed_pass = await this.#hash_password(password);
-		user = await User.create({
-			username:username, 
-			password:hashed_pass, 
-			role:role
-		});
 
-		await user.save();
+		user = await this.#database.create_user(username, hashed_pass, role);
 		return user;
 	}
 
@@ -81,7 +72,7 @@ class Authenticator {
 
 		if (password)
 		{
-			let hashed_pass = this.#hash_password(password);
+			let hashed_pass = await this.#hash_password(password);
 			user.password = hashed_pass;
 		}
 		if (role)
@@ -91,9 +82,7 @@ class Authenticator {
 	}
 
 	async delete_user(username) {
-		let delete_details = await User.deleteOne({username});
-		if (delete_details.deletedCount !== 1)
-			throw Error(`could not delete user ${username}`);
+		await this.#database.delete_user(username);
 		return username;
 	}
 
@@ -110,7 +99,7 @@ class Authenticator {
 	async #get_user(username) {
 		// let filter = {}
 		// filter["username"] = username;
-		let user = await User.findOne({username}).catch(err=> null);
+		let user = await this.#database.get_user(username);
 		return user;
 	}
 

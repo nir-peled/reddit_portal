@@ -1,0 +1,13 @@
+extends default
+
+block contents
+	form(action="login" method="post")
+		label(for="login_username") Username:
+		input(type="text" id="login_username" name="username")
+		br
+		br
+		label(for="login_password") Password:
+		input(type="password" id="login_password" name="password")
+		br
+		br
+		input(type="submit" value="Log In")

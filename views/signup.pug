@@ -1,0 +1,21 @@
+extends default
+
+block contents
+	form(action="signup" method="post")
+		label(for="signup_username") Username:
+		input(type="text" id="signup_username" name="username")
+		br
+		br
+		label(for="signup_password") Password:
+		input(type="password" id="signup_password" name="password")
+		br
+		br
+		p Role:
+		input(type="radio" id="signup_role_user" name="role" value="user")
+		label(for="signup_role_user") User
+		br
+		input(type="radio" id="signup_role_admin" name="role" value="admin")
+		label(for="signup_role_admin") Admin
+		br
+		br
+		input(type="submit" value="Sign Up")

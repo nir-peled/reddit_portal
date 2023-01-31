@@ -1,0 +1,20 @@
+extends default
+
+block contents
+	a(href="/") Home
+	br
+	br
+	div(id="users-table")
+		table
+			tr
+				th Username
+				th Role
+				th Actions
+			- for (let user of users)
+				tr
+					td= user.username
+					td= user.role
+					td
+						a(href="/user/update/" + user.username) Update
+						form(action="/user/delete/" + user.username method="post")
+							input(type="submit" value="Delete")

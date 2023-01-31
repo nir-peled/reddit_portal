@@ -10,8 +10,8 @@ class Server {
 	#database;
 	#authenticator;
 	constructor(config) {
-		this.#listener = new Listener(this, config.uri, config.port);
 		this.#database = new Database(config.database_url);
+		this.#listener = new Listener(this, config.uri, config.port);
 		this.#authenticator = null;
 	}
 
@@ -19,6 +19,10 @@ class Server {
 		await this.#database.connect()
 		this.#authenticator = new Authenticator(this.#database);
 		this.#listener.start();
+	}
+
+	database() {
+		return this.#database;
 	}
 
 	authenticator() {
