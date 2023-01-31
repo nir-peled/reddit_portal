@@ -31,9 +31,9 @@ class Listener {
 
 		// token authentication middleware
 		this.#app.use(async (request, response, next) => {
-			let token = request.cookies.jwt_user;
-			console.log(`request with token .${token}.`); // debug
-			if (token)
+			let token = request.cookies.user_token;
+			if (token) {
+				console.log(`request with token`); // debug
 				try {
 					let user_data = await this.auth().verify(token);
 					request.user_data = user_data;
@@ -41,7 +41,7 @@ class Listener {
 				catch (error) {
 					console.log(error)
 				}
-
+			}
 			next();
 		}); // use 
 		
@@ -92,11 +92,12 @@ class Listener {
 			this.auth().login(username, password)
 			.then((user_data) => {
 				let {user, token} = user_data;
-				response.cookie("jwt_user", token, {
+				response.cookie("user_token", token, {
 					httpOnly: true, 
 					maxAge: this.auth().max_age_sec() * 1000
 				});
-				response.send(`Successful Login: ${user.username}`);
+				// TEMP
+				response.status(200).send(`Successful Login: ${user.username}`);
 				// response.status(200).render("succesful_login", user.username);
 			}) // then
 			.catch((err) => {
@@ -107,6 +108,45 @@ class Listener {
 				});
 			}); // catch
 		}); // post login
+
+		this.#app.put("/update/user", (request, response) => {
+			let curr_user = request.user_data;
+			if (!curr_user || curr_user.role !== "admin")
+				return send_unautorized(response, curr_user);
+
+			let user_details = request.body;
+			this.auth().update_user(user_details)
+			.then((user) => {
+				// TEMP
+				response.status(200).send(`Successful Update: ${JSON.stringify(user)}`);
+			})
+			.catch((err) => {
+				console.log(err); // debug
+				response.status(400).send({
+					message: "Could not update user", 
+					error: err.message
+				});
+			}); // catch
+		}); // put update/user
+
+		this.#app.delete("/delete/user", (request, response) => {
+			let curr_user = request.user_data;
+			if (!curr_user || curr_user.role !== "admin")
+				return send_unautorized(response, curr_user);
+
+			let username = request.body.username;
+			this.auth().delete_user(username)
+			.then(() => {
+				response.status(200).send(`deleted user ${username}`);
+			})
+			.catch((err) => {
+				console.log(err); // debug
+				response.status(400).send({
+					message: "Could not delete user", 
+					error: err.message
+				});
+			});
+		}); // delete delete/user
 	} // end app_setup
 
 	start() {

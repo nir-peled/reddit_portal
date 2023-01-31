@@ -18,7 +18,7 @@ class Authenticator {
 			pass_min_length: 6, 
 			salt_rounds: 10, 
 			max_age_sec: 3 * 60 * 60, // 3 hours
-			default_role: "basic"
+			default_role: "user"
 		}
 		config = {...default_config, ...config}
 
@@ -40,14 +40,14 @@ class Authenticator {
 		if (user !== null)
 			throw new Error("username used");
 
-		let hashed_pass = await bcrypt.hash(password, this.#salt_rounds);
-		user = User.create({
+		let hashed_pass = await this.#hash_password(password);
+		user = await User.create({
 			username:username, 
 			password:hashed_pass, 
 			role:role
 		});
 
-		// await user.save();
+		await user.save();
 		return user;
 	}
 
@@ -73,6 +73,30 @@ class Authenticator {
 		return decoded_token;
 	}
 
+	async update_user(user_details) {
+		let {username, password, role} = user_details;
+		let user = await this.#get_user(username);
+		if (!user)
+			throw Error(`user \"${username}\" not found`);
+
+		if (password)
+		{
+			let hashed_pass = this.#hash_password(password);
+			user.password = hashed_pass;
+		}
+		if (role)
+			user.role = role;
+		await user.save();
+		return user;
+	}
+
+	async delete_user(username) {
+		let delete_details = await User.deleteOne({username});
+		if (delete_details.deletedCount !== 1)
+			throw Error(`could not delete user ${username}`);
+		return username;
+	}
+
 	async #create_token(user) {
 		let token = await jwt.sign({
 			id: user._id,
@@ -88,6 +112,10 @@ class Authenticator {
 		// filter["username"] = username;
 		let user = await User.findOne({username}).catch(err=> null);
 		return user;
+	}
+
+	async #hash_password(password) {
+		return await bcrypt.hash(password, this.#salt_rounds);
 	}
 
 	max_age_sec() {
