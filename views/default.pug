@@ -14,11 +14,11 @@ html
 			div(class="container-fluid d-flex justify-content-around")
 				- if (user_data && user_data.username)
 					h4= "Welcome, " + user_data.username + "!"
-					form(action="logout" method="post")
+					form(action="/logout" method="post")
 						input(type="hidden" name="username" value=user_data.username)
-						input(type="submit" value="Log Out" id="logout_button")
+						input(type="submit" value="Log Out" id="logout_button" class="ref-button")
 				- else
 					h4 Welcome, Guest!
-					a(href="login") Login
+					a(href="login" class="ref-button") Login
 
 		block contents

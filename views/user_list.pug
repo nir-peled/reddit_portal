@@ -10,7 +10,7 @@ block contents
 				th Username
 				th Role
 				th Actions
-			- for (let user of users)
+			each user in users
 				tr
 					td= user.username
 					td= user.role
@@ -18,3 +18,5 @@ block contents
 						a(href="/user/update/" + user.username) Update
 						form(action="/user/delete/" + user.username method="post")
 							input(type="submit" value="Delete")
+			else
+				h4 There Are No Users

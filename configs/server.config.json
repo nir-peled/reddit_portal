@@ -1,5 +1,15 @@
-{
-	"uri": "127.0.0.1", 
-	"port": 8081, 
-	"database_url": "mongodb://127.0.0.1:27017/project" 
+{ 
+	"database_url": "mongodb://127.0.0.1:27017/project",
+	"listener": {
+		"uri": "127.0.0.1", 
+		"port": 8081,
+		"page_posts_limit": 5, 
+		"session_ttl_sec": 3600
+	},
+	"reddit": {
+		"client_id": "r6yOooL-CbyASblsysHIYA",
+		"secret": "Yk_CrdgCnnrIUxWfdpNgeski_ib6Kg", 
+		"access_token_url": "https://www.reddit.com/api/v1/access_token", 
+		"read_url": "https://www.oauth.reddit.com"
+	}	
 }

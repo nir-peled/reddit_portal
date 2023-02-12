@@ -1,0 +1,13 @@
+
+mixin view_post(post)
+	a(href="/reddit/r/" + post.subreddit )= "r/" + post.subreddit
+	h4= post.title
+	- if (post.type == "html")
+		div(class="post-content")
+			| !{post.contents}
+	- else if (post.type == "image")
+		img(src=post.contents alt=post.title class="post-image")
+	- else if (post.type == "link")
+		a(href=post.contents) Link
+	- else
+		p= "Unsupported type: " + post.type

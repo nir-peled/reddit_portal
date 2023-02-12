@@ -4,7 +4,27 @@ extends default
 block contents
 	div(class="container-fluid" id="main-page-contents")
 		h2 Main Page
-		a(href="signup") Sign Up
+		a(href="/signup" class="ref-button") Sign Up
 		br
 		br
-		a(href="users") Users
+		a(href="/users" class="ref-button") Users
+		br
+		br
+		- if (user_data)
+			a(href="/reddit/r/all" class="ref-button") Hot Posts
+			br
+			br
+			a(href="/reddit/saved" class="ref-button") Saved
+			br
+			br
+			div(class="container-fluid" id="main-page-browse-input")
+				form(action="/reddit/sub/" method="get")
+					label(for="subreddit") r/
+					input(type="text" name="subreddit" id="subreddit")
+					input(type="submit" value="Browse Subreddit" class="ref-button")
+			br
+			br
+			div(class="container-fluid" id="main-page-search-input")
+				form(action="/reddit/search/" method="get")
+					input(type="text" name="query" id="query")
+					input(type="submit" value="Search Reddit" class="ref-button")
