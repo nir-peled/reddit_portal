@@ -1,9 +1,10 @@
 extends default
 include view_post
 
+block scripts
+	script(type="text/javascript" src="/scripts/posts.js")
+
 block contents
-	a(href="/" class="ref-button") Home
-	br
 	div(id="post_search_list" class="post_list")
 		form(action="/reddit/search" method="get")
 			label(for="search_input") Search: 
@@ -13,6 +14,8 @@ block contents
 		a(href=`/reddit/search?query=${query}&step=before` class="ref-button") Before
 		a(href=`/reddit/search?query=${query}&step=after` class="ref-button") After
 		br
+		- if (posts.length == 0)
+		p There Are No Posts In Here!
 		each post in posts
 			+view_post(post)
 			br

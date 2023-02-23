@@ -10,6 +10,12 @@ body {
 	max-height: 750px;
 }
 
+.button-list {
+	list-style: none;
+	float: left;
+	text-align: left;
+}
+
 .ref-button {
 	width: auto;
 	font-size: 100%;

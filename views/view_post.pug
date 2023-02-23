@@ -1,7 +1,21 @@
 
 mixin view_post(post)
 	a(href="/reddit/r/" + post.subreddit )= "r/" + post.subreddit
+	p= "by u/" + post.author
 	h4= post.title
+	p= post.type
+
+	- if (post.holder && post.holder == user_data.username)
+		button(id="save-"+post.fullname type="button" value=post.fullname
+		 class="ref-button save-button" hidden) Save
+		button(id="remove-"+post.fullname type="button" value=post.fullname
+		 class="ref-button remove-button") Remove
+	- else
+		button(id="save-"+post.fullname type="button" value=post.fullname
+		 class="ref-button save-button") Save
+		button(id="remove-"+post.fullname type="button" value=post.fullname
+		 class="ref-button remove-button" hidden) Remove
+	br
 	- if (post.type == "html")
 		div(class="post-content")
 			| !{post.contents}

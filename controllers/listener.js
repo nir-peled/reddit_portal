@@ -43,6 +43,7 @@ class Listener {
 
 		this.#setup_user_crud();
 		this.#setup_reddit_calls();
+		this.#setup_posts_crud();
 
 		this.#app.get("/", (request, response) => {
 			console.log("main page"); // debug
@@ -98,7 +99,7 @@ class Listener {
 		}); // use 
 
 		this.#app.get("/signup", (request, response) => {
-			console.log("signup page");
+			console.log("signup page"); // debug
 			response.render("signup");
 		});
 
@@ -283,8 +284,68 @@ class Listener {
 		}); // get reddit search
 	}
 
+	#setup_posts_crud() {
+		// make sure user is logged in
+		this.#app.use("/posts", (request, response, next) => {
+			if (!request.user_data)
+				this.#send_unautorized(response, request.user_data);
+			else
+				next();
+		}); // use posts
+
+		this.#app.get("/posts", (request, response) => {
+			let username = request.user_data.username;
+			this.#database().posts_of(username)
+			.then((posts) => response.render("saved_posts", {posts}))
+			.catch((err) => {
+				console.log(err); // debug
+				response.status(BAD_REQ).send({
+					message: "could not delete post",
+					error: err
+				});
+			}); // catch
+		}); // get posts
+
+		// consider instead of getting new post, 
+		// holding current posts in session and saving
+		// from there
+		this.#app.post("/posts/save", async (request, response) => {
+			let post_fullname = request.body.post;
+			let username = request.user_data.username;
+			console.log(`user ${username} saving post .${post_fullname}.`); // debug
+			this.#reddit().get_post_by_name(post_fullname)
+			.then((post) => {
+				if (!post)
+					throw new Error(`Post ${post_fullname} Not Found`);
+
+				this.#database().save_post(username, post);
+				response.sendStatus(OK);
+			}).catch((err) => {
+				console.log(err); // debug
+				response.status(BAD_REQ).send({
+					message: "could not delete post",
+					error: err
+				});
+			}); // catch
+		}); // post posts save
+
+		this.#app.post("/posts/remove", (request, response) => {
+			let post_fullname = request.body.post;
+			let username = request.user_data.username;
+			this.#database().remove_post_from_user(username, post_fullname)
+			.then(() => response.sendStatus(OK))
+			.catch((err) => {
+				console.log(err);
+				response.status(BAD_REQ).send({
+					message: "could not delete post",
+					error: err
+				});
+			}); // catch
+		}); // post posts remove
+	}
+
 	async #get_posts(username, domain, step, reader) {
-		let request_data = {limit: this.#page_posts_limit, raw_json:1};
+		let request_data = {limit: this.#page_posts_limit};
 		let session = this.#sessions.get(username);
 
 		// handle before/after

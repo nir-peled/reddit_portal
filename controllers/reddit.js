@@ -49,7 +49,7 @@ class Reddit {
 
 		let response = await client.post(this.#access_token_url, form, {headers});
 		this.#auth_token = response.data;
-		setTimeout(this.authenticate_basic, this.#auth_token.expires_in * 1000);
+		setTimeout(() => this.authenticate_basic(), this.#auth_token.expires_in * 1000);
 	}
 
 	async read_posts(subreddit, request_data, auth_token=null) {
@@ -63,10 +63,13 @@ class Reddit {
 	}
 
 	async get_post_by_name(post_fullname, auth_token=null) {
-		let url = this.#read_url += `/api/info?id=${post_fullname}`;
-		let listing = await this.#get_listing(url, auth_token);
-		if (listing.children.length > 0)
-			return this.#post_from_data(listing.children[0]);
+		let url = this.#read_url + `/api/info.json`;
+		let data = {id: post_fullname};
+
+		let listing = await this.#get_listing(url, data, auth_token);
+
+		if (listing.posts.length > 0)
+			return listing.posts[0];
 		return null;
 	}
 
@@ -75,6 +78,46 @@ class Reddit {
 		let url = this.#read_url + `/search.json`;
 		let listing = await this.#get_listing(url, request_data, auth_token);
 		return listing;
+	}
+
+	async #get_listing(url, request_data={}, auth_token=null, headers={}) {
+		if (!auth_token && !this.#auth_token)
+			throw new Error("Not Authenticated");
+		if (!auth_token)
+			auth_token = this.#auth_token;
+
+		request_data.raw_json = 1;
+		let params = new URL.URLSearchParams(request_data);
+		url += `?${params}`;
+
+		let {token_type, access_token} = auth_token;
+		let all_headers = {
+			...this.#default_headers,
+			"Authorization": `${token_type} ${access_token}`, 
+			...headers
+		};
+
+		console.log(`request to ${url}`);
+		let response = await client.get(url, {headers: all_headers});
+		return this.#data_from_listing(response.data);
+	}
+
+	#data_from_listing(listing) {
+		if (!listing || !listing.data)
+			return {before:null, after:null, posts:[]};
+
+		let data = listing.data;
+		let posts = [];
+
+		for (let post_raw of data.children) {
+			posts.push(this.#post_from_data(post_raw.data));
+		}
+
+		return {
+			before: data.before,
+			after: data.after,
+			posts: posts
+		};
 	}
 
 	#post_from_data(post_data) {
@@ -103,42 +146,6 @@ class Reddit {
 		});
 
 		return post;
-	}
-
-	async #get_listing(url, request_data, auth_token=null, headers={}) {
-		if (!auth_token && !this.#auth_token)
-			throw new Error("Not Authenticated");
-		if (!auth_token)
-			auth_token = this.#auth_token;
-
-		let params = new URL.URLSearchParams(request_data);
-		url += `?${params}`;
-
-		let {token_type, access_token} = auth_token;
-		let all_headers = {
-			...this.#default_headers,
-			"Authorization": `${token_type} ${access_token}`, 
-			...headers
-		};
-
-		console.log(`request to ${url}`);
-		let response = await client.get(url, {headers: all_headers});
-		return this.#data_from_listing(response.data);
-	}
-
-	#data_from_listing(listing) {
-		let data = listing.data;
-		let posts = [];
-
-		for (let post_raw of data.children) {
-			posts.push(this.#post_from_data(post_raw.data));
-		}
-
-		return {
-			before: data.before,
-			after: data.after,
-			posts: posts
-		};
 	}
 }
 

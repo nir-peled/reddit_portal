@@ -1,0 +1,15 @@
+extends default
+include view_post
+
+block scripts
+	script(type="text/javascript" src="/scripts/posts.js")
+
+block contents
+	h3 Saved Posts
+
+	- if (posts.length == 0)
+		p There Are No Posts In Here!
+	each post in posts
+			+view_post(post)
+			br
+			br

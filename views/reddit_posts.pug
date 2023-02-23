@@ -1,15 +1,19 @@
 extends default
 include view_post
 
+block scripts
+	script(type="text/javascript" src="/scripts/posts.js")
+
 block contents
-	a(href="/" class="ref-button") Home
-	br
 	div(id="post_list" class="post_list")
 		h3= "Browsing r/" + subreddit
 		a(href="/reddit/r/" + subreddit + "?step=before" class="ref-button") Before
 		a(href="/reddit/r/" + subreddit + "?step=after" class="ref-button") After
 
+		- if (posts.length == 0)
+			p There Are No Posts In Here!
+		br
 		each post in posts
-			+view_post(post)
 			br
+			+view_post(post)
 			br
