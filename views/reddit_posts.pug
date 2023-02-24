@@ -7,8 +7,8 @@ block scripts
 block contents
 	div(id="post_list" class="post_list")
 		h3= "Browsing r/" + subreddit
-		a(href="/reddit/r/" + subreddit + "?step=before" class="ref-button") Before
-		a(href="/reddit/r/" + subreddit + "?step=after" class="ref-button") After
+		a(href="/reddit/r/" + subreddit + "?step=before" class="ref-button") Previous
+		a(href="/reddit/r/" + subreddit + "?step=after" class="ref-button") Next
 
 		- if (posts.length == 0)
 			p There Are No Posts In Here!
@@ -17,3 +17,8 @@ block contents
 			br
 			+view_post(post)
 			br
+		br
+		a(href="/reddit/r/" + subreddit + "?step=before" class="ref-button") Previous
+		a(href="/reddit/r/" + subreddit + "?step=after" class="ref-button") Next
+		br
+		br

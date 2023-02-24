@@ -4,29 +4,31 @@ extends default
 block contents
 	div(class="container-fluid" id="main-page-contents")
 		h2 Main Page
-		ul(class="button-list")
-			li
-				a(href="/signup" class="ref-button" role="button") Sign Up
-			br
-			li
-				a(href="/users" class="ref-button" role="button") Users
-			br
-			- if (user_data)
-				li
-					a(href="/reddit/r/all" class="ref-button" role="button") Hot Posts
-				br
-				li
-					a(href="/posts" class="ref-button" role="button") Saved Posts
-				br
-				li
+		br
+		table(class="button-list")
+			tr
+				td
+					a(href="/signup" class="ref-button" role="button") Sign Up
+				td
+					a(href="/users" class="ref-button" role="button") Users
+				- if (user_data)
+					td
+						a(href="/reddit/r/all" class="ref-button" role="button") Hot Posts
+					td
+						a(href="/posts" class="ref-button" role="button") Saved Posts
+		br
+		br
+		table
+			tr
+				td
 					div(class="container-fluid" id="main-page-browse-input")
 						form(action="/reddit/sub/" method="get")
 							label(for="subreddit") r/
 							input(type="text" name="subreddit" id="subreddit")
 							input(type="submit" value="Browse Subreddit" class="ref-button")
-				br
-				li
-					div(class="container-fluid" id="main-page-search-input")
-						form(action="/reddit/search/" method="get")
-							input(type="text" name="query" id="query")
-							input(type="submit" value="Search Reddit" class="ref-button")
+			tr
+					td
+						div(class="container-fluid" id="main-page-search-input")
+							form(action="/reddit/search/" method="get")
+								input(type="text" name="query" id="query")
+								input(type="submit" value="Search Reddit" class="ref-button")

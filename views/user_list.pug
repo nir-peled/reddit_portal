@@ -1,9 +1,6 @@
 extends default
 
 block contents
-	a(href="/") Home
-	br
-	br
 	div(id="users-table")
 		table
 			tr
@@ -15,8 +12,9 @@ block contents
 					td= user.username
 					td= user.role
 					td
-						a(href="/user/update/" + user.username) Update
+						a(href="/user/update/" + user.username class="ref-button") Update
+					td
 						form(action="/user/delete/" + user.username method="post")
-							input(type="submit" value="Delete")
+							input(type="submit" value="Delete" class="ref-button")
 			else
 				h4 There Are No Users

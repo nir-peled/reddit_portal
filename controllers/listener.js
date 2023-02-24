@@ -12,6 +12,7 @@ const UNAUTHORIZED = 406;
 const BAD_REQ = 400;
 const SERVER_ERR = 500;
 
+var app;
 
 class Listener {
 	#server;
@@ -28,24 +29,25 @@ class Listener {
 		this.#page_posts_limit = config.page_posts_limit;
 		this.#sessions = new SessionManager(config.session_ttl_sec);
 
+		app = this.#app;
 		this.#setup_app();
 	}
 
 	#setup_app() {
-		this.#app.set("view engine", "pug");
-		this.#app.set("views", path.join(__dirname, "../views"));
+		app.set("view engine", "pug");
+		app.set("views", path.join(__dirname, "../views"));
 
-		this.#app.use( cors({origin: this.full_url()}) );
-		this.#app.use( express.static(path.join(__dirname, "../views")) );
-		this.#app.use( express.urlencoded({ extended: true }) );
-		this.#app.use(cookieParser())
-		this.#app.use(express.json());
+		app.use( cors({origin: this.full_url()}) );
+		app.use( express.static(path.join(__dirname, "../views")) );
+		app.use( express.urlencoded({ extended: true }) );
+		app.use(cookieParser())
+		app.use(express.json());
 
 		this.#setup_user_crud();
 		this.#setup_reddit_calls();
 		this.#setup_posts_crud();
 
-		this.#app.get("/", (request, response) => {
+		app.get("/", (request, response) => {
 			console.log("main page"); // debug
 			response.render("index");
 		}); // default page
@@ -54,7 +56,7 @@ class Listener {
 	async start() {
 		console.log("trying to auth reddit");
 		await this.#reddit().authenticate_basic();
-		this.#app.listen(this.#port, () => {
+		app.listen(this.#port, () => {
 			console.log(`server listening on ${this.full_url()}`);
 		});
 	}
@@ -81,7 +83,7 @@ class Listener {
 
 	#setup_user_crud() {
 		// token authentication middleware
-		this.#app.use(async (request, response, next) => {
+		app.use(async (request, response, next) => {
 			console.log(`request to ${request.originalUrl}`); // debug
 			let token = request.cookies.user_token;
 			if (token) {
@@ -98,12 +100,12 @@ class Listener {
 			next();
 		}); // use 
 
-		this.#app.get("/signup", (request, response) => {
+		app.get("/signup", (request, response) => {
 			console.log("signup page"); // debug
 			response.render("signup");
 		});
 
-		this.#app.post("/signup", (request, response) => {
+		app.post("/signup", (request, response) => {
 			console.log("post signup"); // debug
 			console.log(JSON.stringify(request.body)); // debug
 			let {username, password, role} = request.body;
@@ -121,7 +123,7 @@ class Listener {
 			}); // catch
 		}); // signup
 
-		this.#app.get("/login", (request, response) => {
+		app.get("/login", (request, response) => {
 			console.log("get login"); // debug
 			if (request.user_data)
 			{
@@ -133,7 +135,7 @@ class Listener {
 				response.render("login");
 		}); // get login
 
-		this.#app.post("/login", (request, response) => {
+		app.post("/login", (request, response) => {
 			console.log("post login"); // debug
 			console.log(JSON.stringify(request.body)); // debug
 
@@ -158,13 +160,13 @@ class Listener {
 			}); // catch
 		}); // post login
 
-		this.#app.post("/logout", (request, response) => {
+		app.post("/logout", (request, response) => {
 			console.log("post logout"); // debug
 			response.clearCookie("user_token");
 			response.redirect("/")
 		}); // post logout
 
-		this.#app.get("/users", (request, response) => {
+		app.get("/users", (request, response) => {
 			console.log("get users"); // debug
 			this.#database().get_user_list().then((users) => {
 				response.render("user_list", {users});
@@ -177,7 +179,7 @@ class Listener {
 			}); // catch
 		}); // get users
 
-		this.#app.get("/user/update/:username", (request, response) => {
+		app.get("/user/update/:username", (request, response) => {
 			console.log("get update user"); // debug
 			let username = request.params.username
 			let user = this.#database().get_user(username);
@@ -185,9 +187,9 @@ class Listener {
 				response.redirect("/users");
 			else
 				response.render("edit_user", {username, edited_user:user});
-		});
+		}); // post user update
 
-		this.#app.post("/user/update/:username", (request, response) => {
+		app.post("/user/update/:username", (request, response) => {
 			let curr_user = request.user_data;
 			if (!curr_user || curr_user.role !== "admin")
 				return this.#send_unautorized(response, curr_user);
@@ -205,9 +207,9 @@ class Listener {
 					error: err.message
 				});
 			}); // catch
-		}); // post user/update
+		}); // post user update
 
-		this.#app.post("/user/delete/:username", (request, response) => {
+		app.post("/user/delete/:username", (request, response) => {
 			let curr_user = request.user_data;
 			if (!curr_user || curr_user.role !== "admin")
 				return this.#send_unautorized(response, curr_user);
@@ -225,19 +227,19 @@ class Listener {
 					error: err.message
 				});
 			});
-		}); // delete user/delete
+		}); // delete user delete
 	}
 
 	#setup_reddit_calls() {
 		// make sure user is logged in
-		this.#app.use("/reddit", (request, response, next) => {
+		app.use("/reddit", (request, response, next) => {
 			if (!request.user_data)
 				this.#send_unautorized(response, request.user_data);
 			else
 				next();
 		}); // use reddit
 
-		this.#app.get("/reddit/r/:subreddit" ,(request, response) => {
+		app.get("/reddit/r/:subreddit" ,(request, response) => {
 			let {username} = request.user_data;
 			let step = request.query.step;
 			let subreddit = request.params.subreddit;
@@ -256,12 +258,12 @@ class Listener {
 			}); // catch
 		}); // get r :subreddit
 
-		this.#app.get("/reddit/sub", (request, response) => {
+		app.get("/reddit/sub", (request, response) => {
 			let subreddit = request.query.subreddit;
 			response.redirect("/reddit/r/" + subreddit);
-		})
+		});
 
-		this.#app.get("/reddit/search", (request, response) => {
+		app.get("/reddit/search", (request, response) => {
 			let {username} = request.user_data;
 			let query = request.query.query.trim();
 			let step = request.query.step;
@@ -286,14 +288,14 @@ class Listener {
 
 	#setup_posts_crud() {
 		// make sure user is logged in
-		this.#app.use("/posts", (request, response, next) => {
+		app.use("/posts", (request, response, next) => {
 			if (!request.user_data)
 				this.#send_unautorized(response, request.user_data);
 			else
 				next();
 		}); // use posts
 
-		this.#app.get("/posts", (request, response) => {
+		app.get("/posts", (request, response) => {
 			let username = request.user_data.username;
 			this.#database().posts_of(username)
 			.then((posts) => response.render("saved_posts", {posts}))
@@ -309,7 +311,7 @@ class Listener {
 		// consider instead of getting new post, 
 		// holding current posts in session and saving
 		// from there
-		this.#app.post("/posts/save", async (request, response) => {
+		app.post("/posts/save", async (request, response) => {
 			let post_fullname = request.body.post;
 			let username = request.user_data.username;
 			console.log(`user ${username} saving post .${post_fullname}.`); // debug
@@ -329,7 +331,7 @@ class Listener {
 			}); // catch
 		}); // post posts save
 
-		this.#app.post("/posts/remove", (request, response) => {
+		app.post("/posts/remove", (request, response) => {
 			let post_fullname = request.body.post;
 			let username = request.user_data.username;
 			this.#database().remove_post_from_user(username, post_fullname)

@@ -141,6 +141,7 @@ class Reddit {
 			author : post_data.author,
 			author_fullname : post_data.author_fullname,
 			link : post_data.permalink,
+			thumbnail: post_data.thumbnail,
 			type: type, 
 			contents: contents
 		});

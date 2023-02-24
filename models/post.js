@@ -35,6 +35,10 @@ const PostSchema = new mongoose.Schema({
 		type: String, 
 		required: true
 	}, 
+	thumbnail: {
+		type: String, 
+		required: true
+	},
 	holder: {
 		type: String
 	}

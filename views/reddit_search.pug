@@ -11,12 +11,17 @@ block contents
 			input(type="text" id="search_input" name="query" value=query)
 		br
 		br
-		a(href=`/reddit/search?query=${query}&step=before` class="ref-button") Before
-		a(href=`/reddit/search?query=${query}&step=after` class="ref-button") After
+		a(href=`/reddit/search?query=${query}&step=before` class="ref-button") Previous
+		a(href=`/reddit/search?query=${query}&step=after` class="ref-button") Next
+		br
 		br
 		- if (posts.length == 0)
-		p There Are No Posts In Here!
+			p There Are No Posts In Here!
 		each post in posts
 			+view_post(post)
 			br
 			br
+		a(href=`/reddit/search?query=${query}&step=before` class="ref-button") Previous
+		a(href=`/reddit/search?query=${query}&step=after` class="ref-button") Next
+		br
+		br
