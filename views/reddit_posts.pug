@@ -5,7 +5,7 @@ block scripts
 	script(type="text/javascript" src="/scripts/posts.js")
 
 block contents
-	div(id="post_list" class="post_list")
+	div(id="post_list" class="container-fluid post_list")
 		h3= "Browsing r/" + subreddit
 		a(href="/reddit/r/" + subreddit + "?step=before" class="ref-button") Previous
 		a(href="/reddit/r/" + subreddit + "?step=after" class="ref-button") Next
