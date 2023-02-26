@@ -11,10 +11,11 @@ block contents
 				tr
 					td= user.username
 					td= user.role
-					td
-						a(href="/user/update/" + user.username class="ref-button") Update
-					td
-						form(action="/user/delete/" + user.username method="post")
-							input(type="submit" value="Delete" class="ref-button")
+					- if (user_data && user_data.role == "admin")
+						td
+							a(href="/user/update/" + user.username class="ref-button") Update
+						td
+							form(action="/user/delete/" + user.username method="post")
+								input(type="submit" value="Delete" class="ref-button")
 			else
 				h4 There Are No Users
