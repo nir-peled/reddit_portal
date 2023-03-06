@@ -78,7 +78,7 @@ class Listener {
 	}
 
 	#send_unautorized(response, user) {
-		response.status(406).send("You must be an autorized user to perform this action!")
+		response.status(UNAUTHORIZED).send("You must be an autorized user to perform this action!");
 	}
 
 	#setup_user_crud() {
